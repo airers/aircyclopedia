@@ -1,14 +1,29 @@
 {
   "name": "random-express",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
+    "start:dev": "nodemon ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.15.2"
-  }
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "morgan": "^1.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airers/airengine.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/airers/airengine/issues"
+  },
+  "homepage": "https://github.com/airers/airengine#readme",
+  "description": ""
 }
