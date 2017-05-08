@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "ubuntu",
+    "password": null,
+    "database": "air-dev",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "ubuntu",
+    "password": null,
+    "database": "air-test",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "ubuntu",
+    "password": null,
+    "database": "air-production",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}
