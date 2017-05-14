@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "ubuntu",
-    "password": null,
+    "password": "password",
     "database": "air-dev",
     "host": "127.0.0.1",
     "port": 5432,
@@ -9,7 +9,7 @@
   },
   "test": {
     "username": "ubuntu",
-    "password": null,
+    "password": "password",
     "database": "air-test",
     "host": "127.0.0.1",
     "port": 5432,
@@ -17,7 +17,7 @@
   },
   "production": {
     "username": "ubuntu",
-    "password": null,
+    "password": "password",
     "database": "air-production",
     "host": "127.0.0.1",
     "port": 5432,
