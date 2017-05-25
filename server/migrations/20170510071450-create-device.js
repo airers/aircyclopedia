@@ -14,7 +14,6 @@ module.exports = {
       },
       lastSeen: {
         type: Sequelize.DATE,
-        allowNull: false,
       },
       lastReading: {
         type: Sequelize.DATE

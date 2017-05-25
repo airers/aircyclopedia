@@ -1,13 +1,16 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Phone = sequelize.define('Phone', {
+    phoneUuid: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     phoneInfo: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     lastSeen: {
       type: DataTypes.DATE,
-      allowNull: false,
     }
   }, {
     classMethods: {

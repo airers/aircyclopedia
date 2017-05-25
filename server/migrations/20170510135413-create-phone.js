@@ -8,13 +8,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      phoneUuid: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       phoneInfo: {
         type: Sequelize.STRING,
         allowNull: false
       },
       lastSeen: {
         type: Sequelize.DATE,
-        allowNull: false
       },
       createdAt: {
         type: Sequelize.DATE,

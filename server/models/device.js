@@ -7,7 +7,6 @@ module.exports = function(sequelize, DataTypes) {
     },
     lastSeen: {
       type: DataTypes.DATE,
-      allowNull: false,
     },
     lastReading: {
       type: DataTypes.DATE
