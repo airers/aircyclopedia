@@ -1,24 +1,50 @@
 const Reading = require('../models').Reading;
+const Device = require('../models').Device;
+const Phone = require('../models').Phone;
 
 module.exports = {
   add(req, res) {
     // TODO:
-    // 1. verify of phoneUuid exists in Phones table
-    // 2. verify if sensorUuid matches deviceId in Devices table
-    // - if any of the above fail, return error
-    // 3. For each item in the req.body, do findOrCreate (inc. time)
-    return Reading
-      .create({
-        deviceTime: req.body.deviceTime,
-        pm25: req.body.pm25,
-        microclimate: req.body.microclimate,
-        locationLat: req.body.locationLat,
-        locationLon: req.body.locationLon,
-        locationAcc: req.body.locationAcc,
-        locationEle: req.body.locationEle
-      })
-      .then(reading => res.status(201).send(reading))
-      .catch(error => res.status(400).send(error));
+    // 1. verify phoneUuid consistency
+    // 2. verify phoneUuid exists in Phones table
+    // 3. get all devices belonging to Phone
+    // 3b. verify all deviceIds exist in list, and match their sensorUuid
+    // 4. map findOrCreate(newReading) to an array
+    // 5. do .all().then(): return send{success:arrLength, failure:0}
+    // 6. do .catch(): return send{success:numReadings-arrLength, failure: arrLength}
+    // TODO: test if req.body works
+
+    req.body.forEach(function(newReading) {
+      var phonePromise = Phone.findOne({
+        where: {phoneUuid: newReading.phoneUuid}
+      });
+      var devicePromise = Device.findOne({
+        where: {
+          id: newReading.deviceId,
+          sensorUuid: newReading.sensorUuid
+        }
+      });
+
+      var promises = [phonePromise, devicePromise];
+      Promise.all(promises).then(function(results) {
+        if (!results[0] || !results[1]) {
+          return res.status(404).send({
+            message: 'Invalid phone or device details',
+          });
+        }
+        Reading.findOrCreate({ // where and defaults?
+          deviceTime: req.body.deviceTime,
+          pm25: req.body.pm25,
+          microclimate: req.body.microclimate,
+          locationLat: req.body.locationLat,
+          locationLon: req.body.locationLon,
+          locationAcc: req.body.locationAcc,
+          locationEle: req.body.locationEle
+        })
+        .then(reading => res.status(201).send(reading))
+        .catch(error => res.status(400).send(error));
+      }).catch(error => res.status(400).send(error));
+    });
   },
   list(req, res) {
     // TODO: At some point, probably want some filters
