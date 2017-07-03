@@ -100,11 +100,10 @@ Now try to visit `localhost:3000`. If you see a message similar to this, it is w
 {"message":"Welcome to aircyclopedia","version":"v a0.0.1"}
 ```
 
-## WARNING: Unverified instructions
-
 ### Installing Postgres
 [Installation](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04#connect-to-postgres-with-the-new-user).
 [Setup help](https://www.cyberciti.biz/faq/howto-add-postgresql-user-account).
+You'll need to create [a user](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line).
 
 This assumes you are already ssh'd into the VM
 ```sh
@@ -113,7 +112,7 @@ sudo apt-get install -y postgresql postgresql-contrib
 
 sudo -i -u postgres # Login to the postgres user
 
-
+createuser -s air # We'll create a user for accessing the db
 createuser -s ubuntu # Let the root user be a superuser
 # Note: Check the name of your root user first by typing whoami before logging in as the postgres user
 createdb air-dev
@@ -126,6 +125,16 @@ psql -d air-dev
 # To quit type \q
 
 ```
+
+## WARNING: Unverified instructions
+
+
+
+Run migrations:
+```sh
+sequelize db:migrate
+```
+> Note: This will discover the migrations in our migrations folder and execute them. If you try running the same command again, it would not execute any migrations since it's clever enough to know that all of the current migrations have been executed.
 
 
 You'll need to create [a user](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line), a database and modify the `server/config/config.json` file with your own db config (remember to remove the file from the repo before placing any sensitive info).
