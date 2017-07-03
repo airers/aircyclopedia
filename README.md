@@ -84,6 +84,9 @@ export NVM_DIR="$HOME/.nvm"
 nvm install --lts=boron
 nvm set default lts/boron
 npm install -g sequelize-cli
+
+# Copy the config file
+cp server/config/config.sample.json server/config/config.json
 ```
 
 We will now check if the port forwarding works. The database is not installed yet but we will worry about that later.
@@ -113,6 +116,10 @@ sudo apt-get install -y postgresql postgresql-contrib
 sudo -i -u postgres # Login to the postgres user
 
 createuser -s air # We'll create a user for accessing the db
+# Set the password for the user.
+# NOTE: We will need this password for the config.json file
+sudo -u postgres psql -c "ALTER USER air WITH PASSWORD 'aires';"
+
 createuser -s ubuntu # Let the root user be a superuser
 # Note: Check the name of your root user first by typing whoami before logging in as the postgres user
 createdb air-dev
@@ -121,13 +128,11 @@ exit # Logoff the postgres user
 
 # Optional: Check if db works
 psql -d air-dev
-
 # To quit type \q
 
+# Important! Edit the config to reflect your username and password
+vi server/config/config.json # This should have been created in the previous step
 ```
-
-## WARNING: Unverified instructions
-
 
 
 Run migrations:
@@ -136,6 +141,7 @@ sequelize db:migrate
 ```
 > Note: This will discover the migrations in our migrations folder and execute them. If you try running the same command again, it would not execute any migrations since it's clever enough to know that all of the current migrations have been executed.
 
+## WARNING: Unverified instructions
 
 You'll need to create [a user](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line), a database and modify the `server/config/config.json` file with your own db config (remember to remove the file from the repo before placing any sensitive info).
 ```sh
