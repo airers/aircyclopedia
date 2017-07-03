@@ -102,9 +102,31 @@ Now try to visit `localhost:3000`. If you see a message similar to this, it is w
 
 ## WARNING: Unverified instructions
 
-### Postgres
+### Installing Postgres
 [Installation](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04#connect-to-postgres-with-the-new-user).
 [Setup help](https://www.cyberciti.biz/faq/howto-add-postgresql-user-account).
+
+This assumes you are already ssh'd into the VM
+```sh
+sudo apt-get update
+sudo apt-get install -y postgresql postgresql-contrib
+
+sudo -i -u postgres # Login to the postgres user
+
+
+createuser -s ubuntu # Let the root user be a superuser
+# Note: Check the name of your root user first by typing whoami before logging in as the postgres user
+createdb air-dev
+
+exit # Logoff the postgres user
+
+# Optional: Check if db works
+psql -d air-dev
+
+# To quit type \q
+
+```
+
 
 You'll need to create [a user](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line), a database and modify the `server/config/config.json` file with your own db config (remember to remove the file from the repo before placing any sensitive info).
 ```sh
