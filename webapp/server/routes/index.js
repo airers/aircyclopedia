@@ -9,6 +9,6 @@ module.exports = (app) => {
   app.get('/api/v1/readings/latest', readingsController.latest);
   app.get('/api/v1/readings', readingsController.list);
 
-  app.post('/api/v1/readings/add', readingsController.add);
+  app.post('/api/v1/readings', readingsController.add);
   app.post('/api/v1/register_device', devicesController.register);
 };

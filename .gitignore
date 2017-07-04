@@ -1,1 +1,8 @@
 node_modules
+npm-debug.log
+
+vagrant/.vagrant
+vagrant/*.log
+.DS_Store
+
+webapp/server/config/config.json
