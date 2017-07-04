@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "ubuntu",
-    "password": "password",
+    "username": "air",
+    "password": "airersdevpass",
     "database": "air-dev",
     "host": "127.0.0.1",
     "port": 5432,

@@ -86,15 +86,17 @@ nvm set default lts/boron
 npm install -g sequelize-cli
 
 # Copy the config file
+cd webapp
 cp server/config/config.sample.json server/config/config.json
+npm install
+
 ```
 
 We will now check if the port forwarding works. The database is not installed yet but we will worry about that later.
 
 ```bash
-cd webapp
-npm install
 npm run start:dev
+# Ctrl + C to stop the program
 ```
 
 Now try to visit `localhost:3000`. If you see a message similar to this, it is working.
@@ -116,15 +118,15 @@ sudo apt-get install -y postgresql postgresql-contrib
 sudo -i -u postgres # Login to the postgres user
 
 createuser -s air # We'll create a user for accessing the db
-# Set the password for the user.
-# NOTE: We will need this password for the config.json file
-sudo -u postgres psql -c "ALTER USER air WITH PASSWORD 'aires';"
-
 createuser -s ubuntu # Let the root user be a superuser
 # Note: Check the name of your root user first by typing whoami before logging in as the postgres user
 createdb air-dev
 
 exit # Logoff the postgres user
+
+# Set the password for the user 'air'
+# NOTE: We will need this password for the config.json file
+sudo -u postgres psql -c "ALTER USER air WITH PASSWORD 'airersdevpass';"
 
 # Optional: Check if db works
 psql -d air-dev
@@ -139,24 +141,51 @@ Run migrations:
 ```sh
 sequelize db:migrate
 ```
-> Note: This will discover the migrations in our migrations folder and execute them. If you try running the same command again, it would not execute any migrations since it's clever enough to know that all of the current migrations have been executed.
 
-## WARNING: Unverified instructions
 
-You'll need to create [a user](https://www.a2hosting.com/kb/developer-corner/postgresql/managing-postgresql-databases-and-users-from-the-command-line), a database and modify the `server/config/config.json` file with your own db config (remember to remove the file from the repo before placing any sensitive info).
-```sh
-$ sudo -i -u postgres
-$ createuser --interactive ## Create a postgres user. If your default user is 'ubuntu', create a postgres user with the same name.
-$ psql
-$ createdb -O <user> <dbname> ## Create db with <user> as owner
+## Testing
+**Important: Do this from your local machine, not the VM**
+
+#### Add a device
+POST with these application/x-www-form-urlencoded parameters, (or paste the CURL)
+
+>phoneUuid:1234567890abcdef
+>sensorUuid:fedcba0987654321
+>phoneInfo:{"model": "Regular phone", "type": "Android"}
+
+```
+curl -X POST \
+  http://localhost:3000/api/v1/register_device \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -d 'phoneUuid=1234567890abcdef&sensorUuid=fedcba0987654321&phoneInfo=%7B%22model%22%3A%20%22Regular%20phone%22%2C%20%22type%22%3A%20%22Android%22%7D'
+```
+Expected output
+```
+{"id":1,"lastSeen":"2017-07-04T13:19:04.672Z","lastReading":null,"sensorUuid":"fedcba0987654321","updatedAt":"2017-07-04T13:19:04.681Z","createdAt":"2017-07-04T13:19:04.681Z"}
 ```
 
-Now you can access your db via your default user using `psql <dbname>`.
 
-## Running the app
-```sh
-$ npm run start:dev
+Add a reading **NOT WORKING**
 ```
+curl -X POST \
+  http://localhost:3000//api/v1/readings \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -d 'device_id=1&phone_uuid=1234567890abcdef&sensor_uuid=fedcba0987654321&deviceTime=1234567890&pm25=12.4&microclimate=int&locationLat=1.5&locationLon=103.5&locationAcc=10&locationEle=5.5'
+```
+
+
+Retrieve the reading **NOT WORKING**
+```
+curl -X GET \
+  http://localhost:3000//api/v1/readings/latest \
+  -H 'cache-control: no-cache' \
+  -H 'phoneuuid: 1234567890abcdef' \
+  -H 'sensoruuid: fedcba0987654321'
+```
+
+
 
 ## Development tips
 Other than `npm install`, everything should be done in the `server` folder.
