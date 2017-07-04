@@ -44,7 +44,6 @@ https://www.getpostman.com/apps
 
 # VM Development Setup
 
-This readme is not yet complete, so here are some tutorial links to get you started
 
 ### Staring the VM
 
@@ -132,8 +131,9 @@ sudo -u postgres psql -c "ALTER USER air WITH PASSWORD 'airersdevpass';"
 psql -d air-dev
 # To quit type \q
 
-# Important! Edit the config to reflect your username and password
-vi server/config/config.json # This should have been created in the previous step
+# Optional! Edit the config to reflect your username and password
+# Only if you changed the password, if not it's already set
+vi server/config/config.json
 ```
 
 
@@ -146,7 +146,7 @@ sequelize db:migrate
 ## Testing
 **Important: Do this from your local machine, not the VM**
 
-#### Add a device
+### Add a device
 POST with these application/x-www-form-urlencoded parameters, (or paste the CURL)
 
 >phoneUuid:1234567890abcdef
@@ -166,7 +166,7 @@ Expected output
 ```
 
 
-Add a reading **NOT WORKING**
+### Add a reading **NOT WORKING**
 ```
 curl -X POST \
   http://localhost:3000//api/v1/readings \
@@ -176,7 +176,7 @@ curl -X POST \
 ```
 
 
-Retrieve the reading **NOT WORKING**
+### Retrieve the reading **NOT WORKING**
 ```
 curl -X GET \
   http://localhost:3000//api/v1/readings/latest \
