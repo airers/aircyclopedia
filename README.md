@@ -98,7 +98,7 @@ npm run start:dev
 # Ctrl + C to stop the program
 ```
 
-Now try to visit `localhost:3000`. If you see a message similar to this, it is working.
+Now try to visit `localhost:3000` or `127.0.0.1:3000`. If you see a message similar to this, it is working.
 
 ```
 {"message":"Welcome to aircyclopedia","version":"v a0.0.1"}
@@ -145,6 +145,7 @@ sequelize db:migrate
 
 ## Testing
 **Important: Do this from your local machine, not the VM**
+Restart the sever.
 
 ### Add a device
 POST with these application/x-www-form-urlencoded parameters, (or paste the CURL)
