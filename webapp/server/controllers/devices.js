@@ -1,5 +1,6 @@
 const Device = require('../models').Device;
 const Phone = require('../models').Phone;
+const uuidv4 = require('uuid/v4');
 
 module.exports = {
   register(req, res) {
@@ -27,7 +28,7 @@ module.exports = {
         if ( !created ) { // Update last seen
           phone.update({
             lastSeen: Date.now()
-          }).then(() => {})
+          }).then(() => {});
         }
         getDevice(phone, sensorUuid)
       })
@@ -40,6 +41,7 @@ module.exports = {
           sensorUuid: sensorUuid,
         },
         defaults: {
+          serverDeviceId: uuidv4(),
           lastSeen: Date.now(),
           lastReading: null,
         }
@@ -53,7 +55,10 @@ module.exports = {
             lastSeen: Date.now()
           }).then(() => {})
         }
-        returnData(device)
+        returnData({
+          id: device.serverDeviceId,
+          lastReading: device.lastReading
+        })
       })
       .catch(error => returnError(error));
     }
