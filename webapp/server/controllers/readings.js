@@ -21,37 +21,94 @@ module.exports = {
     // 6. do .catch(): return send{success:numReadings-arrLength, failure: arrLength}
     // TODO: test if req.body works
 
-    req.body.forEach(function(newReading) {
-      var phonePromise = Phone.findOne({
-        where: {phoneUuid: newReading.phoneUuid}
-      });
-      var devicePromise = Device.findOne({
-        where: {
-          id: newReading.deviceId,
-          sensorUuid: newReading.sensorUuid
-        }
-      });
-
-      var promises = [phonePromise, devicePromise];
-      Promise.all(promises).then(function(results) {
-        if (!results[0] || !results[1]) {
-          return res.status(404).send({
-            message: 'Invalid phone or device details',
-          });
-        }
-        Reading.findOrCreate({ // where and defaults?
-          deviceTime: req.body.deviceTime,
-          pm25: req.body.pm25,
-          microclimate: req.body.microclimate,
-          locationLat: req.body.locationLat,
-          locationLon: req.body.locationLon,
-          locationAcc: req.body.locationAcc,
-          locationEle: req.body.locationEle
-        })
-        .then(reading => res.status(201).send(reading))
-        .catch(error => res.status(400).send(error));
-      }).catch(error => res.status(400).send(error));
+    var readings = req.body;
+    if ( Object.prototype.toString.call( readings ) !== '[object Array]' ) {
+      returnError('{ "error":"Incorrect format" }');
+    }
+    
+    var readingsHash = {};
+    
+    // Sort them into their individual hashes
+    readings.forEach( function(reading) {
+      if ( readingsHash.hasOwnProperty(reading.serverDeviceId) ) {
+        readingsHash[reading.serverDeviceId].push(reading);
+      } else {
+        readingsHash[reading.serverDeviceId] = [reading];
+      }
     });
+    
+    console.log(readingsHash);
+    
+    const returnObject = {
+      pass: 0,
+      fail: 0
+    }
+    let promiseCompletion = 0;
+    let promiseFire = 0;
+    
+    for (let id in readingsHash) {
+      if (readingsHash.hasOwnProperty(id)) {
+        const readingArray = readingsHash[id];
+        Device.findOne({
+          where: {
+            serverDeviceId: id
+          }
+        }).then( device => {
+          if ( device !== null ) {
+            console.log( "Found device for ", id );
+            returnObject.pass += readingArray.length;
+          } else {
+            console.log( "No device for", id);
+            returnObject.fail += readingArray.length;
+          }
+          promiseCompletion++;
+          promiseDone();
+        });
+      }
+    }
+    
+    function promiseDone() {
+      if ( promiseCompletion >= 2) {
+        res.status(201).send(returnObject);
+      }
+    }
+    // return;
+    // 
+    // req.body.forEach(function(newReading) {
+    //   var phonePromise = Phone.findOne({
+    //     where: {phoneUuid: newReading.phoneUuid}
+    //   });
+    //   var devicePromise = Device.findOne({
+    //     where: {
+    //       id: newReading.deviceId,
+    //       sensorUuid: newReading.sensorUuid
+    //     }
+    //   });
+    // 
+    //   var promises = [phonePromise, devicePromise];
+    //   Promise.all(promises).then(function(results) {
+    //     if (!results[0] || !results[1]) {
+    //       return res.status(404).send({
+    //         message: 'Invalid phone or device details',
+    //       });
+    //     }
+    //     Reading.findOrCreate({ // where and defaults?
+    //       deviceTime: req.body.deviceTime,
+    //       pm25: req.body.pm25,
+    //       microclimate: req.body.microclimate,
+    //       locationLat: req.body.locationLat,
+    //       locationLon: req.body.locationLon,
+    //       locationAcc: req.body.locationAcc,
+    //       locationEle: req.body.locationEle
+    //     })
+    //     .then(reading => res.status(201).send(reading))
+    //     .catch(error => res.status(400).send(error));
+    //   }).catch(error => res.status(400).send(error));
+    // });
+    
+    function returnError(error) {
+      res.status(400).send(error);
+    }
   },
 
   latest(req, res) {
