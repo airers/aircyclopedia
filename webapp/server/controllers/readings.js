@@ -3,6 +3,13 @@ const Device = require('../models').Device;
 const Phone = require('../models').Phone;
 
 module.exports = {
+  list(req, res) {
+    // TODO: At some point, probably want some filters
+    return Reading
+      .all()
+      .then(readings => res.status(200).send(readings))
+      .catch(error => res.status(400).send(error));
+  },
   add(req, res) {
     // TODO:
     // 1. verify phoneUuid consistency
@@ -46,13 +53,7 @@ module.exports = {
       }).catch(error => res.status(400).send(error));
     });
   },
-  list(req, res) {
-    // TODO: At some point, probably want some filters
-    return Reading
-      .all()
-      .then(readings => res.status(200).send(readings))
-      .catch(error => res.status(400).send(error));
-  },
+
   latest(req, res) {
     // TODO:
     // 1. Check if phoneUuid exists in phone table
