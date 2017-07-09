@@ -10,7 +10,14 @@ module.exports = {
       .then(readings => res.status(200).send(readings))
       .catch(error => res.status(400).send(error));
   },
+  
   add(req, res) {
+    let serverDeviceId = req.params.serverDeviceId;
+    if ( serverDeviceId === null || serverDeviceId === undefined ) {
+      returnError('Incorrect format');
+      return;
+    }
+    
     // TODO:
     // 1. verify phoneUuid consistency
     // 2. verify phoneUuid exists in Phones table
@@ -26,68 +33,50 @@ module.exports = {
       returnError('Incorrect format');
     }
     
-    let readingsHash = {};
-    
-    // Sort them into their individual hashes
-    readings.forEach( function(reading) {
-      if ( readingsHash.hasOwnProperty(reading.serverDeviceId) ) {
-        readingsHash[reading.serverDeviceId].push(reading);
-      } else {
-        readingsHash[reading.serverDeviceId] = [reading];
-      }
-    });
-    
     const returnObject = {
       pass: 0,
       fail: 0
     }
     
     // Variables used for knowing when the events are complete
-    let deviceCount = 0;
     let promiseCompletion = 0;
     let promiseFire = 0;
-    let devicePromises = 0;
     
-    for (let id in readingsHash) {
-      if (readingsHash.hasOwnProperty(id)) {
-        deviceCount++;
-        const readingArray = readingsHash[id];
-        Device.findOne({
-          attributes: ['id'],
-          where: {
-            serverDeviceId: id
-          }
-        }).then( (device) => {
-          if ( device !== null ) {
-            console.log( "Found device for ", id, device );
-            readingArray.forEach((reading) => {
-              reading.deviceId = device.id;
-              verifyData(reading);
-              promiseFire++;
-              Reading.create(reading).then( (response) => {
-                returnObject.pass++;
-                promiseCompletion++;
-                promiseDone();
-              }).catch( (error) => {
-                console.log(error);
-                returnObject.fail++;
-                promiseCompletion++;
-                promiseDone();
-              });
-            });
-          } else {
-            console.log( "No device for", id);
-            returnObject.fail += readingArray.length;
-          }
-          devicePromises++;
-          promiseDone();
-        });
+    Device.findOne({
+      attributes: ['id'],
+      where: {
+        serverDeviceId: serverDeviceId
       }
-    }
+    }).then( (device) => {
+      if ( device !== null ) {
+        console.log( "Found device for ", serverDeviceId, device );
+        readings.forEach((reading) => {
+          reading.deviceId = device.id;
+          verifyData(reading);
+          promiseFire++;
+          Reading.create(reading).then( (response) => {
+            returnObject.pass++;
+            promiseCompletion++;
+            promiseDone();
+          }).catch( (error) => {
+            console.log(error);
+            returnObject.fail++;
+            promiseCompletion++;
+            promiseDone();
+          });
+        });
+      } else {
+        console.log( "No device for", id);
+        returnObject.fail += readings.length;
+        promiseDone();
+      }
+
+
+    });
+
     
     function promiseDone() {
-      if ( devicePromises >= deviceCount &&
-           promiseCompletion >= promiseFire) {
+      if ( promiseCompletion >= promiseFire) {
         res.status(201).send(returnObject);
       }
     }

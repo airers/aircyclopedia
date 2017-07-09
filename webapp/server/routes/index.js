@@ -6,14 +6,12 @@ module.exports = (app) => {
     message: 'Welcome to the Airers API!',
   }));
 
-  
-  app.get('/api/v1/readings', readingsController.list);
-  app.post('/api/v1/readings', readingsController.add);
-  app.get('/api/v1/readings/latest', readingsController.latest);
-  
-  
-  app.get('/api/v1/devices/:serverDeviceId/readings/latest', readingsController.latest);
 
   app.post('/api/v1/devices/register', devicesController.register);
+  // app.get('/api/v1/devices/:serverDeviceId/readings', readingsController.list);
+  app.post('/api/v1/devices/:serverDeviceId/readings', readingsController.add);
+  app.get('/api/v1/devices/:serverDeviceId/readings/latest', readingsController.latest);
+
+
 
 };
