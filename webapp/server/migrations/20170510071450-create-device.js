@@ -8,9 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      serverDeviceId: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       sensorUuid: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false
       },
       lastSeen: {
         type: Sequelize.DATE,
