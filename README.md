@@ -56,7 +56,7 @@ There are two main folders, `vagrant` and `webapp`.
 
 The vm runs on Ubuntu 16.04 LTS. It is configured to map the `webapp` folder to the `/home/ubuntu/webapp` folder on the guest machine.
 
-It also maps the VM port to your localhost port 3000.
+It also maps the VM port to your localhost port 3210.
 
 **Start the VM**
 
@@ -98,7 +98,7 @@ npm run start:dev
 # Ctrl + C to stop the program
 ```
 
-Now try to visit `localhost:3000` or `127.0.0.1:3000`. If you see a message similar to this, it is working.
+Now try to visit `localhost:3210` or `127.0.0.1:3210`. If you see a message similar to this, it is working.
 
 ```
 {"message":"Welcome to aircyclopedia","version":"v a0.0.1"}
@@ -156,7 +156,7 @@ POST with these application/x-www-form-urlencoded parameters, (or paste the CURL
 
 ```
 curl -X POST \
-  http://localhost:3000/api/v1/register_device \
+  http://localhost:3210/api/v1/register_device \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/x-www-form-urlencoded' \
   -d 'phoneUuid=1234567890abcdef&sensorUuid=fedcba0987654321&phoneInfo=%7B%22model%22%3A%20%22Regular%20phone%22%2C%20%22type%22%3A%20%22Android%22%7D'
@@ -170,7 +170,7 @@ Expected output
 ### Add a reading **NOT WORKING**
 ```
 curl -X POST \
-  http://localhost:3000//api/v1/readings \
+  http://localhost:3210//api/v1/readings \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/x-www-form-urlencoded' \
   -d 'device_id=1&phone_uuid=1234567890abcdef&sensor_uuid=fedcba0987654321&deviceTime=1234567890&pm25=12.4&microclimate=int&locationLat=1.5&locationLon=103.5&locationAcc=10&locationEle=5.5'
@@ -180,7 +180,7 @@ curl -X POST \
 ### Retrieve the reading **NOT WORKING**
 ```
 curl -X GET \
-  http://localhost:3000//api/v1/readings/latest \
+  http://localhost:3210//api/v1/readings/latest \
   -H 'cache-control: no-cache' \
   -H 'phoneuuid: 1234567890abcdef' \
   -H 'sensoruuid: fedcba0987654321'

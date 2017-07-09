@@ -1,6 +1,10 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Device = sequelize.define('Device', {
+    serverDeviceId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     sensorUuid: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -25,7 +29,13 @@ module.exports = function(sequelize, DataTypes) {
             foreignKey: 'deviceId'
         });
       }
-    }
+    },
+    indexes: [
+      {
+        unique: true,
+        fields: ['serverDeviceId']
+      }
+    ]
   });
   return Device;
 };

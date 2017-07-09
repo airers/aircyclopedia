@@ -1,5 +1,6 @@
 const Device = require('../models').Device;
 const Phone = require('../models').Phone;
+const uuidv4 = require('uuid/v4');
 
 module.exports = {
   register(req, res) {
@@ -11,35 +12,68 @@ module.exports = {
     // 6. Return deviceId
     // TODO: DeviceUuid (IDs in general) has to be a UUID instead of an int.
     // TODO: convert to async/await
-    console.log(req.body);
-    return Phone
-      .findOrCreate({
+    function getPhone(phoneUuid, phoneInfo, sensorUuid) {
+      Phone.findOrCreate({
         where: {
-          phoneUuid: req.body.phoneUuid,
+          phoneUuid: phoneUuid,
         },
         defaults: {
-          phoneInfo: req.body.phoneInfo,
+          phoneInfo: JSON.stringify(phoneInfo),
           lastSeen: Date.now(),
         }
       })
       .spread((phone, created) => {
         // TODO: update lastSeen
-        return Device
-        .findOrCreate({
-          where: {
-            sensorUuid: req.body.sensorUuid,
-          },
-          defaults: {
-            lastSeen: Date.now(),
-            lastReading: null,
-          }
-        })
-        .spread((device, created) => {
-          res.status(201).send(device);
-        })
-        .catch(error => res.status(400).send(error));
+        console.log("Created", created);
+        if ( !created ) { // Update last seen
+          phone.update({
+            lastSeen: Date.now()
+          }).then(() => {});
+        }
+        getDevice(phone, sensorUuid)
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => returnError(error));
+    }
+
+    function getDevice(phone, sensorUuid) {
+      Device.findOrCreate({
+        where: {
+          sensorUuid: sensorUuid,
+        },
+        defaults: {
+          serverDeviceId: uuidv4(),
+          lastSeen: Date.now(),
+          lastReading: null,
+        }
+      })
+      .spread((device, created) => {
+        if (created) {
+          device.addPhone(phone)
+        }
+        if (!created) {
+          device.update({
+            lastSeen: Date.now()
+          }).then(() => {})
+        }
+        returnData({
+          id: device.serverDeviceId,
+          lastReading: device.lastReading
+        })
+      })
+      .catch(error => returnError(error));
+    }
+    
+    
+    function returnData(data) {
+      res.status(201).send(data)
+    }
+    function returnError(error) {
+      res.status(400).send(error);
+    }
+    
+    getPhone(req.body.phoneUuid, req.body.phoneInfo, req.body.sensorUuid);
+    
+    
     // Device
     //   .findOrCreate({
     //     where: {
