@@ -21,12 +21,12 @@ module.exports = {
     // 6. do .catch(): return send{success:numReadings-arrLength, failure: arrLength}
     // TODO: test if req.body works
 
-    var readings = req.body;
+    let readings = req.body;
     if ( Object.prototype.toString.call( readings ) !== '[object Array]' ) {
-      returnError('{ "error":"Incorrect format" }');
+      returnError('Incorrect format');
     }
     
-    var readingsHash = {};
+    let readingsHash = {};
     
     // Sort them into their individual hashes
     readings.forEach( function(reading) {
@@ -37,15 +37,13 @@ module.exports = {
       }
     });
     
-    let deviceCount = 0;
-    
-    console.log(readingsHash);
-    
     const returnObject = {
       pass: 0,
       fail: 0
     }
     
+    // Variables used for knowing when the events are complete
+    let deviceCount = 0;
     let promiseCompletion = 0;
     let promiseFire = 0;
     let devicePromises = 0;
@@ -69,13 +67,11 @@ module.exports = {
               Reading.create(reading).then( (response) => {
                 returnObject.pass++;
                 promiseCompletion++;
-                console.log("Promise success");
                 promiseDone();
               }).catch( (error) => {
                 console.log(error);
                 returnObject.fail++;
                 promiseCompletion++;
-                console.log("Promise error");
                 promiseDone();
               });
             });
@@ -128,43 +124,14 @@ module.exports = {
       }
       return pass;
     }
-    // return;
-    // 
-    // req.body.forEach(function(newReading) {
-    //   var phonePromise = Phone.findOne({
-    //     where: {phoneUuid: newReading.phoneUuid}
-    //   });
-    //   var devicePromise = Device.findOne({
-    //     where: {
-    //       id: newReading.deviceId,
-    //       sensorUuid: newReading.sensorUuid
-    //     }
-    //   });
-    // 
-    //   var promises = [phonePromise, devicePromise];
-    //   Promise.all(promises).then(function(results) {
-    //     if (!results[0] || !results[1]) {
-    //       return res.status(404).send({
-    //         message: 'Invalid phone or device details',
-    //       });
-    //     }
-    //     Reading.findOrCreate({ // where and defaults?
-    //       deviceTime: req.body.deviceTime,
-    //       pm25: req.body.pm25,
-    //       microclimate: req.body.microclimate,
-    //       locationLat: req.body.locationLat,
-    //       locationLon: req.body.locationLon,
-    //       locationAcc: req.body.locationAcc,
-    //       locationEle: req.body.locationEle
-    //     })
-    //     .then(reading => res.status(201).send(reading))
-    //     .catch(error => res.status(400).send(error));
-    //   }).catch(error => res.status(400).send(error));
-    // });
     
-    function returnError(error) {
-      res.status(400).send(error);
+    function returnError(error, status) {
+      if ( status === null || status === undefined ) {
+        status = 400;
+      }
+      res.status(status).send('{ "error":"'+error+'" }');
     }
+
   },
 
   latest(req, res) {
@@ -178,9 +145,65 @@ module.exports = {
     // gotta get a merge of Reading and Device (inefficient?)
     // And do a findAll() on sensorUuid
     // http://stackoverflow.com/questions/35445849/sequelize-findone-latest-entry
-    return Reading
-      .all()
-      .then(readings => res.status(200).send(readings))
-      .catch(error => res.status(400).send(error));
+    // Locate device with ID
+    let serverDeviceId = req.params.serverDeviceId;
+    console.log(req.params);
+    if ( serverDeviceId === null || serverDeviceId === undefined ) {
+      returnError('Incorrect format');
+      return;
+    }
+  
+    Device.findOne({
+      attributes: ['id'],
+      where: {
+        serverDeviceId: serverDeviceId
+      }
+    }).then((device) => {
+      if ( device === null ) {
+        returnError('Invalid device');
+        return;
+      }
+      console.log("Found device with id ", device.id);
+      getLatestReading(device.id);
+    }).catch((error) => {
+      returnError(error);
+    });
+    
+    
+    function getLatestReading(deviceId) {
+      Reading.findOne({
+        attributes: ['deviceTime', 'pm25', 'microclimate'],
+        where: {
+          deviceId: deviceId
+        },
+        order: '"deviceTime" DESC'
+      }).then((reading) => {
+        returnReading(reading);
+      }).catch((error) => {
+        returnReading();
+      })
+    }
+    
+    function returnReading(reading) {
+      const returnObject = {
+        exist: false,
+        reading: {}
+      };
+      if ( reading !== null && reading !== undefined ) {
+        returnObject.exist = true;
+        returnObject.reading = reading;
+      }
+
+      res.status(200).send(returnObject);        
+    }
+    
+    function returnError(error, status) {
+      if ( status === null || status === undefined ) {
+        status = 400;
+      }
+      res.status(status).send('{ "error":"'+error+'" }');
+    }
   },
+  
+  
 };
