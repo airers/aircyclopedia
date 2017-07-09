@@ -37,40 +37,96 @@ module.exports = {
       }
     });
     
+    let deviceCount = 0;
+    
     console.log(readingsHash);
     
     const returnObject = {
       pass: 0,
       fail: 0
     }
+    
     let promiseCompletion = 0;
     let promiseFire = 0;
+    let devicePromises = 0;
     
     for (let id in readingsHash) {
       if (readingsHash.hasOwnProperty(id)) {
+        deviceCount++;
         const readingArray = readingsHash[id];
         Device.findOne({
+          attributes: ['id'],
           where: {
             serverDeviceId: id
           }
-        }).then( device => {
+        }).then( (device) => {
           if ( device !== null ) {
-            console.log( "Found device for ", id );
-            returnObject.pass += readingArray.length;
+            console.log( "Found device for ", id, device );
+            readingArray.forEach((reading) => {
+              reading.deviceId = device.id;
+              verifyData(reading);
+              promiseFire++;
+              Reading.create(reading).then( (response) => {
+                returnObject.pass++;
+                promiseCompletion++;
+                console.log("Promise success");
+                promiseDone();
+              }).catch( (error) => {
+                console.log(error);
+                returnObject.fail++;
+                promiseCompletion++;
+                console.log("Promise error");
+                promiseDone();
+              });
+            });
           } else {
             console.log( "No device for", id);
             returnObject.fail += readingArray.length;
           }
-          promiseCompletion++;
+          devicePromises++;
           promiseDone();
         });
       }
     }
     
     function promiseDone() {
-      if ( promiseCompletion >= 2) {
+      if ( devicePromises >= deviceCount &&
+           promiseCompletion >= promiseFire) {
         res.status(201).send(returnObject);
       }
+    }
+    
+    function verifyData(reading) {
+      let pass = true;
+      if ( reading.deviceTime === undefined || reading.deviceTime === null ) {
+        reading.deviceTime = Date.now();
+        pass = false;
+      }
+      if ( reading.pm25 === undefined || reading.pm25 === null ) {
+        reading.pm25 = 2.6;
+        pass = false;
+      }
+      if ( reading.microclimate === undefined || reading.microclimate === null ) {
+        reading.microclimate = 1;
+        pass = false;
+      }
+      if ( reading.locationLat === undefined || reading.locationLat === null ) {
+        reading.locationLat = 1.3;
+        pass = false;
+      }
+      if ( reading.locationLon === undefined || reading.locationLon === null ) {
+        reading.locationLon = 103;
+        pass = false;
+      }
+      if ( reading.locationAcc === undefined || reading.locationAcc === null ) {
+        reading.locationAcc = 10;
+        pass = false;
+      }
+      if ( reading.locationEle === undefined || reading.locationEle === null ) {
+        reading.locationEle = 5;
+        pass = false;
+      }
+      return pass;
     }
     // return;
     // 
