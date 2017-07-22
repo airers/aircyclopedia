@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = require('morgan');
+const path = require('path');
 const bodyParser = require('body-parser');
 
 // Set up the express app
@@ -12,12 +13,15 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(express.static(path.join(__dirname, 'static')));
+
 // Require routes into the applcation
-require('./server/routes')(app);
-// Setup a default catch-all route that sends back a welcome message in JSON format.
-app.get('*', (req, res) => res.status(200).send({
-  message: 'Welcome to aircyclopedia',
-  version: 'v a0.0.1'
-}));
+const api = require('./server/routes/api');
+app.use('/api', api);
+
+// Catch all other routes and return the index file
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'static/index.html'));
+});
 
 module.exports = app;
