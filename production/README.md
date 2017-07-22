@@ -49,6 +49,26 @@ NODE_ENV=production sequelize db:migrate
 ```
 ## Deploy the application
 
+```bash
 cd ~/aircyclopedia/webapp
 
 forever start -c "npm run start:prod" .
+```
+
+## Redeploy the application
+
+Yes, there is no auto deploy just yet. Manual deployment *shrudder*.
+
+
+```bash
+eval "$(ssh-agent -s)"
+```
+
+`cd ~/aircyclopedia/webapp`
+
+`forever list` To show the processes. There should be only one.
+
+`forever stop 0` Put the ID of the running process.
+
+Pull the branch you want, then deploy as per normal.
+
