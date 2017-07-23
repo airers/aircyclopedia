@@ -20,6 +20,7 @@ router.get('/v1/devices/:serverDeviceId/readings/latest', readingsController.lat
 router.get('/v1/phones', phonesController.list);
 router.get('/v1/devices', devicesController.list);
 router.get('/v1/devices/:serverDeviceId/readings', readingsController.list);
+router.get('/v1/devices/:serverDeviceId/phones', phonesController.readingPhones);
 
 
 router.get('/*', (req, res) => res.status(400).send({

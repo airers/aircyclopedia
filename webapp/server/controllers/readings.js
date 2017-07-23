@@ -28,7 +28,7 @@ module.exports = {
           .then(readings => res.status(200).send(readings))
           .catch(error => res.status(400).send(error));
       }
-    });
+    })
   },
   
   add(req, res) {

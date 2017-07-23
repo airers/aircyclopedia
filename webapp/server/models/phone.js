@@ -17,9 +17,9 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         // associations can be defined here
         Phone.belongsToMany(models.Device, {
-            through: 'PhoneDevice',
-            as: 'devices',
-            foreignKey: 'phoneId'
+          through: 'PhoneDevice',
+          as: 'devices',
+          foreignKey: 'phoneId'
         });
       }
     }
