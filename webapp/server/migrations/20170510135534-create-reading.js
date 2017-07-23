@@ -22,7 +22,7 @@ module.exports = {
         allowNull: false,
       },
       pm25: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
       microclimate: {
