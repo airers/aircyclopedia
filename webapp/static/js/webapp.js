@@ -18,10 +18,10 @@ const app = new Vue({
       });
     },
     loadReadings: function(device) {
+      this.readings = null;
       this.phones = null;
       this.selectedDevice = device.sensorUuid;
       console.log(device);
-      this.readings = null;
       axios.get('/api/v1/devices/'+device.serverDeviceId+'/readings')
       .then((response) => {
         this.readings = response.data;
@@ -32,12 +32,11 @@ const app = new Vue({
     },
     loadPhones: function(device) {
       this.readings = null;
+      this.phones = null;
       this.selectedDevice = device.sensorUuid;
-      console.log(device);
-      this.readings = null;
       axios.get('/api/v1/devices/'+device.serverDeviceId+'/phones')
       .then((response) => {
-        this.readings = response.data;
+        this.phones = response.data;
       })
       .catch((error) => {
         console.log(error);

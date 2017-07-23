@@ -76,14 +76,16 @@
         <table class="u-full-width">
           <thead>
             <tr>
-              <th>Phone ID</th>
               <th>Brand</th>
               <th>Model</th>
+              <th>Version</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="phone in phones">
-            
+              <th>{{phone.phoneInfo.manufacturer}}</th>
+              <th>{{phone.phoneInfo.marketName}}</th>
+              <th>{{phone.phoneInfo.androidVersionRelease}}</th>
             </tr>
           </tbody>
         </table>
