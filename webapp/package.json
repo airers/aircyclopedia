@@ -16,19 +16,21 @@
     "pg": "^6.2.4",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.30.4",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "vue": "^2.4.2",
+    "vue-router": "^2.7.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/airers/airengine.git"
+    "url": "git+https://github.com/airers/aircyclopedia.git"
   },
   "keywords": [],
   "bugs": {
-    "url": "https://github.com/airers/airengine/issues"
+    "url": "https://github.com/airers/aircyclopedia/issues"
   },
-  "homepage": "https://github.com/airers/airengine#readme",
+  "homepage": "https://github.com/airers/aircyclopedia#readme",
   "description": ""
 }

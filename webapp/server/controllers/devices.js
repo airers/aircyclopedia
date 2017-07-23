@@ -3,6 +3,13 @@ const Phone = require('../models').Phone;
 const uuidv4 = require('uuid/v4');
 
 module.exports = {
+  list(req, res) {
+    Device.findAll({
+        attributes: ['serverDeviceId', 'sensorUuid']
+      })
+      .then(devices => res.status(200).send(devices))
+      .catch(error => res.status(400).send(error));
+  },
   register(req, res) {
     // 1. findOrCreate Phone with phoneUuid and phoneInfo
     // 2. Update Phone lastSeen to now

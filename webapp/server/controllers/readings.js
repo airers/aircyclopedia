@@ -4,11 +4,31 @@ const Phone = require('../models').Phone;
 
 module.exports = {
   list(req, res) {
-    // TODO: At some point, probably want some filters
-    return Reading
-      .all()
-      .then(readings => res.status(200).send(readings))
-      .catch(error => res.status(400).send(error));
+    let serverDeviceId = req.params.serverDeviceId;
+    if ( serverDeviceId === null || serverDeviceId === undefined ) {
+      returnError('Incorrect format');
+      return;
+    }
+    
+    Device.findOne({
+      attributes: ['id'],
+      where: {
+        serverDeviceId: serverDeviceId
+      }
+    }).then( (device) => {
+      if ( device !== null ) {
+        Reading
+          .findAll({
+            attributes: ['deviceTime', 'pm25', 'microclimate'],
+            where: {
+              deviceId: device.id
+            },
+            order: '"deviceTime" DESC'
+          })
+          .then(readings => res.status(200).send(readings))
+          .catch(error => res.status(400).send(error));
+      }
+    });
   },
   
   add(req, res) {
